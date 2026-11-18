@@ -1,0 +1,38 @@
+server:
+  port: 8080
+  shutdown: graceful   # при docker stop завершить начатые запросы
+  error:
+    include-message: always   # текст причины ошибки в ответе
+
+spring:
+  application:
+    name: order-service
+  datasource:
+    # все параметры подключения приходят из окружения (compose.yaml / .env)
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  sql:
+    init:
+      mode: always   # schema.sql + data.sql при старте
+  jackson:
+    serialization:
+      indent-output: true
+
+app:
+  # идентификатор экземпляра: в контейнере HOSTNAME = короткий id контейнера
+  instance-id: ${INSTANCE_ID:${HOSTNAME:local}}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %-5level [${app.instance-id}] %logger{0} : %msg%n"
